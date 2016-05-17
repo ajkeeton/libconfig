@@ -33,6 +33,7 @@
 #include <cstdlib>
 #include <sstream>
 #include <stdio.h>
+#include <iostream>
 
 namespace libconfig {
 
@@ -45,45 +46,42 @@ class FileStream {
         FileStream() {};
 
         ~FileStream() {
-            if (m_fmem)
+            if (!m_is_closed)
                 fclose(m_fmem);
             if (m_buff)
                 free(m_buff);
         };
 
         bool init() {
+            if (!m_is_closed)
+                return true;
+
             if ((m_fmem = open_memstream(&m_buff, &m_size)) == NULL) {
                 perror("open_memstr()");
                 return false;
             }
+
+            m_is_closed = false;
             return true;
         }
 
         std::string str() {
-            char buf[65535];
-            int64_t fpos = std::ftell(m_fmem);
+            if (!m_is_closed)
+                return "";
 
-            m_str = "";
-            std::fseek(m_fmem, 0, SEEK_SET);
-            while (!std::feof(m_fmem)) {
-                std::fgets(buf, sizeof(buf), m_fmem); 
-                m_str += buf;
-            }
-            std::fseek(m_fmem, fpos, SEEK_SET);
-
-            return m_str;
+            return std::string(m_buff);
         }
 
         FILE *file() { return m_fmem; };
 
+        void close() { fclose(m_fmem); m_is_closed = true; };
+
     private:
         FILE *m_fmem = NULL;
-        char *m_buff = NULL;;
+        char *m_buff = NULL;
         size_t m_size = 0;
-        std::string m_str = "";
+        bool m_is_closed = true;
 };
-
-// ---------------------------------------------------------------------------
 
 // ---------------------------------------------------------------------------
 
@@ -511,6 +509,7 @@ void Config::writeString(std::string &str)
     if (!config_write_file_handle(_config, fs.file()))
         handleError();
 
+    fs.close();
     str = fs.str();
 }
 // ---------------------------------------------------------------------------
