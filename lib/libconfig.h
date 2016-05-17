@@ -134,6 +134,8 @@ extern LIBCONFIG_API int config_read_string(config_t *config, const char *str);
 
 extern LIBCONFIG_API int config_read_file(config_t *config,
                                           const char *filename);
+
+extern LIBCONFIG_API int config_write_file_handle(config_t *config, FILE *stream);
 extern LIBCONFIG_API int config_write_file(config_t *config,
                                            const char *filename);
 

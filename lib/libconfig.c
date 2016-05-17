@@ -724,6 +724,13 @@ int config_read_file(config_t *config, const char *filename)
 
 /* ------------------------------------------------------------------------- */
 
+int config_write_file_handle(config_t *config, FILE *stream)
+{
+  config_write(config, stream);
+  config->error_type = CONFIG_ERR_NONE;
+  return(CONFIG_TRUE);
+}
+
 int config_write_file(config_t *config, const char *filename)
 {
   FILE *stream = fopen(filename, "wt");

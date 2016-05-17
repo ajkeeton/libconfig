@@ -32,8 +32,58 @@
 #include <cstring>
 #include <cstdlib>
 #include <sstream>
+#include <stdio.h>
 
 namespace libconfig {
+
+// ---------------------------------------------------------------------------
+// This class could be a lot more useful with additional methods, such as close(),
+// open(), and reset(), but for now, it's just quick and dirty to allow us to
+// read a libconfig object into a string.
+class FileStream {
+    public:
+        FileStream() {};
+
+        ~FileStream() {
+            if (m_fmem)
+                fclose(m_fmem);
+            if (m_buff)
+                free(m_buff);
+        };
+
+        bool init() {
+            if ((m_fmem = open_memstream(&m_buff, &m_size)) == NULL) {
+                perror("open_memstr()");
+                return false;
+            }
+            return true;
+        }
+
+        std::string str() {
+            char buf[65535];
+            int64_t fpos = std::ftell(m_fmem);
+
+            m_str = "";
+            std::fseek(m_fmem, 0, SEEK_SET);
+            while (!std::feof(m_fmem)) {
+                std::fgets(buf, sizeof(buf), m_fmem); 
+                m_str += buf;
+            }
+            std::fseek(m_fmem, fpos, SEEK_SET);
+
+            return m_str;
+        }
+
+        FILE *file() { return m_fmem; };
+
+    private:
+        FILE *m_fmem = NULL;
+        char *m_buff = NULL;;
+        size_t m_size = 0;
+        std::string m_str = "";
+};
+
+// ---------------------------------------------------------------------------
 
 // ---------------------------------------------------------------------------
 
@@ -452,6 +502,17 @@ void Config::readFile(const char *filename)
     handleError();
 }
 
+// ---------------------------------------------------------------------------
+void Config::writeString(std::string &str)
+{
+    FileStream fs;
+    fs.init();
+
+    if (!config_write_file_handle(_config, fs.file()))
+        handleError();
+
+    str = fs.str();
+}
 // ---------------------------------------------------------------------------
 
 void Config::writeFile(const char *filename)
