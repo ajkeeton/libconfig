@@ -43,14 +43,19 @@ namespace libconfig {
 // read a libconfig object into a string.
 class FileStream {
     public:
-        FileStream() {};
+        FileStream() 
+            : m_fmem(NULL)
+            , m_buff(NULL)
+            , m_size(0U)
+            , m_is_closed(true)
+        {}
 
         ~FileStream() {
             if (!m_is_closed)
                 fclose(m_fmem);
             if (m_buff)
                 free(m_buff);
-        };
+        }
 
         bool init() {
             if (!m_is_closed)
@@ -72,15 +77,15 @@ class FileStream {
             return std::string(m_buff);
         }
 
-        FILE *file() { return m_fmem; };
+        inline FILE *file() { return m_fmem; }
 
-        void close() { fclose(m_fmem); m_is_closed = true; };
+        inline void close() { fclose(m_fmem); m_is_closed = true; }
 
     private:
-        FILE *m_fmem = NULL;
-        char *m_buff = NULL;
-        size_t m_size = 0;
-        bool m_is_closed = true;
+        FILE *m_fmem;
+        char *m_buff;
+        std::size_t m_size;
+        bool m_is_closed;
 };
 
 // ---------------------------------------------------------------------------
