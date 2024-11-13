@@ -568,6 +568,11 @@ bool Config::lookupValue(const char *path, bool &value) const
 
 // ---------------------------------------------------------------------------
 
+bool Config::lookupValue(const char *path, unsigned char &value) const
+{
+  CONFIG_LOOKUP_NO_EXCEPTIONS(path, unsigned char, value);
+}
+
 bool Config::lookupValue(const char *path, int &value) const
 {
   CONFIG_LOOKUP_NO_EXCEPTIONS(path, int, value);
@@ -578,6 +583,13 @@ bool Config::lookupValue(const char *path, int &value) const
 bool Config::lookupValue(const char *path, unsigned int &value) const
 {
   CONFIG_LOOKUP_NO_EXCEPTIONS(path, unsigned int, value);
+}
+
+// ---------------------------------------------------------------------------
+
+bool Config::lookupValue(const char *path, unsigned long &value) const
+{
+  CONFIG_LOOKUP_NO_EXCEPTIONS(path, unsigned long, value);
 }
 
 // ---------------------------------------------------------------------------
@@ -722,6 +734,15 @@ Setting::operator bool() const
 
 // ---------------------------------------------------------------------------
 
+Setting::operator unsigned char() const
+{
+  assertType(TypeUByte);
+
+  return(config_setting_get_bool(_setting) ? true : false);
+}
+
+// ---------------------------------------------------------------------------
+
 Setting::operator int() const
 {
   assertType(TypeInt);
@@ -843,6 +864,17 @@ Setting & Setting::operator=(bool value)
 // ---------------------------------------------------------------------------
 
 Setting & Setting::operator=(int value)
+{
+  assertType(TypeInt);
+
+  config_setting_set_int(_setting, value);
+
+  return(*this);
+}
+
+// ---------------------------------------------------------------------------
+
+Setting & Setting::operator=(const unsigned long &value)
 {
   assertType(TypeInt);
 
@@ -1001,6 +1033,13 @@ bool Setting::lookupValue(const char *name, unsigned int &value) const
 bool Setting::lookupValue(const char *name, long long &value) const
 {
   SETTING_LOOKUP_NO_EXCEPTIONS(name, long long, value);
+}
+
+// ---------------------------------------------------------------------------
+
+bool Setting::lookupValue(const char *name, unsigned long &value) const
+{
+  SETTING_LOOKUP_NO_EXCEPTIONS(name, unsigned long, value);
 }
 
 // ---------------------------------------------------------------------------

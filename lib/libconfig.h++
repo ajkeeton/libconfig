@@ -153,6 +153,7 @@ class LIBCONFIGXX_API Setting
   {
     TypeNone = 0,
     // scalar types
+    TypeUByte,
     TypeInt,
     TypeInt64,
     TypeFloat,
@@ -193,6 +194,7 @@ class LIBCONFIGXX_API Setting
   void setFormat(Format format);
 
   operator bool() const;
+  operator uint8_t() const;
   operator int() const;
   operator unsigned int() const;
   operator long() const;
@@ -210,6 +212,7 @@ class LIBCONFIGXX_API Setting
   Setting & operator=(bool value);
   Setting & operator=(int value);
   Setting & operator=(long value);
+  Setting & operator=(const unsigned long &value);
   Setting & operator=(const long long &value);
   Setting & operator=(const double &value);
   Setting & operator=(float value);
@@ -228,9 +231,11 @@ class LIBCONFIGXX_API Setting
   Setting & operator[](int index) const;
 
   bool lookupValue(const char *name, bool &value) const;
+  bool lookupValue(const char *name, unsigned char &value) const;
   bool lookupValue(const char *name, int &value) const;
   bool lookupValue(const char *name, unsigned int &value) const;
   bool lookupValue(const char *name, long long &value) const;
+  bool lookupValue(const char *name, unsigned long &value) const;
   bool lookupValue(const char *name, unsigned long long &value) const;
   bool lookupValue(const char *name, double &value) const;
   bool lookupValue(const char *name, float &value) const;
@@ -240,10 +245,16 @@ class LIBCONFIGXX_API Setting
   inline bool lookupValue(const std::string &name, bool &value) const
   { return(lookupValue(name.c_str(), value)); }
 
+  inline bool lookupValue(const std::string &name, unsigned char &value) const
+  { return(lookupValue(name.c_str(), value)); }
+
   inline bool lookupValue(const std::string &name, int &value) const
   { return(lookupValue(name.c_str(), value)); }
 
   inline bool lookupValue(const std::string &name, unsigned int &value) const
+  { return(lookupValue(name.c_str(), value)); }
+
+  inline bool lookupValue(const std::string &name, unsigned long &value) const
   { return(lookupValue(name.c_str(), value)); }
 
   inline bool lookupValue(const std::string &name, long long &value) const
@@ -492,9 +503,11 @@ class LIBCONFIGXX_API Config
   { return(exists(path.c_str())); }
 
   bool lookupValue(const char *path, bool &value) const;
+  bool lookupValue(const char *path, unsigned char &value) const;
   bool lookupValue(const char *path, int &value) const;
   bool lookupValue(const char *path, unsigned int &value) const;
   bool lookupValue(const char *path, long long &value) const;
+  bool lookupValue(const char *path, unsigned long &value) const;
   bool lookupValue(const char *path, unsigned long long &value) const;
   bool lookupValue(const char *path, double &value) const;
   bool lookupValue(const char *path, float &value) const;
@@ -504,6 +517,9 @@ class LIBCONFIGXX_API Config
   inline bool lookupValue(const std::string &path, bool &value) const
   { return(lookupValue(path.c_str(), value)); }
 
+  inline bool lookupValue(const std::string &path, unsigned char &value) const
+  { return(lookupValue(path.c_str(), value)); }
+
   inline bool lookupValue(const std::string &path, int &value) const
   { return(lookupValue(path.c_str(), value)); }
 
@@ -511,6 +527,10 @@ class LIBCONFIGXX_API Config
   { return(lookupValue(path.c_str(), value)); }
 
   inline bool lookupValue(const std::string &path, long long &value) const
+  { return(lookupValue(path.c_str(), value)); }
+
+  inline bool lookupValue(const std::string &path,
+                          unsigned long &value) const
   { return(lookupValue(path.c_str(), value)); }
 
   inline bool lookupValue(const std::string &path,
